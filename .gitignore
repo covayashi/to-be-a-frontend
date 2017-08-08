@@ -1,0 +1,14 @@
+*~
+*.bak
+*.png
+*.csv
+Thumbs.db
+desktop.ini
+.DS_Store
+.buildpath
+.project
+.settings
+.htaccess
+favicon.ico
+web.config
+before-build/
