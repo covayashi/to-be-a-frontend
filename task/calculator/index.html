@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html xml:lang="ja" lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<style type="text/css">
+    a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;vertical-align:baseline}*{box-sizing:border-box}body{padding:10px}h1{margin-bottom:50px}#specification{border-radius:5px;border:1px solid #ccc;padding:10px;margin-top:50px}.calculator .input-panel,.calculator .panel,.calculator .panel-no-border{display:inline-block;padding:5px}.calculator{font-size:13px;line-height:13px}.calculator .input-panel{border-radius:5px;border:1px solid #ccc}.calculator .panel{border-radius:5px;border:1px solid #ccc;cursor:pointer}.calculator .red{background:#ff9b9b}.calculator .blue{background:#5cceff}.calculator .green{background:#4cff66}.calculator .lgreen{background:#71ffcd}.calculator .orange{background:#ffb34d}.calculator .yellow{background:#ffec46}.calculator .gray{background:#868686}.calculator .borde{margin-top:10px}.calculator .borde p{line-height:20px}
+</style>
+<title>case01 - 電卓</title>
+</head>
+<body>
+    <h1>電卓</h1>
+    <div id="js-vue">
+        <calculator></calculator>
+        <div id="specification">
+            <h3>仕様</h3>
+            <p>右辺と左辺の計算結果が出力される事</p>
+            <p>右辺と左辺には数字のみ入力可能な事</p>
+            <p>右辺と左辺どちらかでも空の場合は、状況に応じたエラー文言が表示される事</p>
+            <p>演算子を押下した場合は、演算子が ＋, −, ×, ÷ と切り替わる事</p>
+            <p>演算子が切り替わると、該当のUIの背景色も変わる事</p>
+            <p>[→←]を押下した場合は右辺と左辺が入れ分かる事</p>
+            <p>[save]を押下した場合はその時の計算式と結果が画面上に保存される事</p>
+            <p>また、同じ計算式は重複保存できない事</p>
+        </div>
+    </div>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://unpkg.com/vue@2.1.10/dist/vue.js"></script>
+    <script type="text/javascript">
+        var temp
+        = '<div class="calculator">'
+        + '    <div class="panel" @click="saveCal" :class="[saveFlg ? \'lgreen\' : \'gray\']">save</div>'
+        + '    <div class="panel yellow" @click="changeNumber">→←</div>'
+        + '    <input v-model="numberOne" type="number" class="input-panel">'
+        + '    <div class="panel" @click="changeCalType" :class="[calType[calTyepSelected] == \'＋\' ? \'red\' : calType[calTyepSelected] == \'−\' ? \'blue\' : calType[calTyepSelected] == \'×\' ? \'green\' : \'orange\']">{{calType[calTyepSelected]}}</div>'
+        + '    <input v-model="numberTwo" type="number" class="input-panel">'
+        + '    <div class="panel-no-border">=</div>'
+        + '    <div class="panel-no-border">{{exe}}</div>'
+        + '    <div v-if="save" class="borde">'
+        + '        <p v-for="(val, key) in save">{{val}}</p>'
+        + '    </div>'
+        + '</div>';
+
+        Vue.component('calculator', {
+            template: temp,
+            data: function(){
+                return {
+                    numberOne: "",
+                    numberTwo: "",
+                    calType: ['＋', '−', '×', '÷'],
+                    calTyepSelected: 0,
+                    save: []
+                }
+            },
+            methods: {
+                saveCal: function(){
+                    if(this.saveFlg){
+                        var saveText = this.numberOne + ' ' + this.calType[this.calTyepSelected] + ' ' + this.numberTwo + ' = ' + this.exe;
+                        this.save.push(saveText);
+                    }
+                },
+                changeNumber: function(){
+                    var one = this.numberOne;
+                    var two = this.numberTwo;
+                    this.numberOne = two;
+                    this.numberTwo = one;
+                },
+                changeCalType: function(){
+                    if(this.calTyepSelected < 3){
+                        this.calTyepSelected++;
+                    }else{
+                        this.calTyepSelected = 0;
+                    }
+                }
+            },
+            computed: {
+                saveFlg: function(){
+                    var saveText = this.numberOne + ' ' + this.calType[this.calTyepSelected] + ' ' + this.numberTwo + ' = ' + this.exe;
+                    this.save.indexOf(saveText);
+                    if(this.save.indexOf(saveText) > -1){
+                        return false;
+                    }else{
+                        return true;
+                    }
+                },
+                exe: function(){
+                    this.saveFlg = true;
+                    if(this.numberOne !== "" && this.numberTwo !== ""){
+                        var num;
+                        if(this.calTyepSelected === 0){
+                            num = this.numberOne + this.numberTwo;
+                        }else if(this.calTyepSelected === 1){
+                            num = this.numberOne - this.numberTwo;
+                        }else if(this.calTyepSelected === 2){
+                            num = this.numberOne * this.numberTwo;
+                        }else if(this.calTyepSelected === 3){
+                            num = this.numberOne / this.numberTwo;
+                        }
+                        return num;
+                    }else{
+                        var errorText = '';
+                        if(this.numberOne === ""){
+                            errorText += '左辺'
+                        }
+                        if(this.numberTwo === ""){
+                            errorText += '右辺'
+                        }
+                        return errorText += 'に数値を入力して下さい。';
+                    }
+                }
+            }
+        });
+
+        var vue = new Vue({
+            el: '#js-vue'
+        });
+    </script>
+</body>
+</html>
