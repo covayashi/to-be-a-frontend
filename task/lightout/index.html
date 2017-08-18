@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<html xml:lang="ja" lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link href="https://fonts.googleapis.com/css?family=Rajdhani" rel="stylesheet">
+<style type="text/css">
+    a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h0,h2,h3,h4,h5,h6,header,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;vertical-align:baseline}*{box-sizing:border-box}body{padding:10px}h1{margin-bottom:50px}#specification{border-radius:5px;border:1px solid #ccc;padding:10px;margin-top:50px}
+    body {
+        background: #111;
+        background-size: .2em 100%;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 3em;
+        text-transform: uppercase;
+        margin: 0;
+    }
+    h1{
+        text-align: center;
+        color: #256073;
+        margin: 20px 0;
+    }
+    .lightout{
+        display: flex;
+        flex-wrap: wrap;
+        width: 260px;
+        margin: 0 auto;
+    }
+    .lightout .box{
+        margin: 1px;
+        width: 50px;
+        height: 50px;
+        border-radius: 4px;
+    }
+    .on{
+        /* box-shadow */
+        box-shadow:0px 0px 20px 4px #fff0ba inset;
+        -moz-box-shadow:0px 0px 20px 4px #fff0ba inset;
+        -webkit-box-shadow:0px 0px 20px 4px #fff0ba inset;
+
+        /* border-radius */
+        border-radius:5px;
+        -moz-border-radius:5px;
+        -webkit-border-radius:5px;
+
+        /* border */
+        border:1px solid #fff500;
+    }
+    .off{
+        /* box-shadow */
+        box-shadow:0px 0px 20px 4px #2a4171 inset;
+        -moz-box-shadow:0px 0px 20px 4px #2a4171 inset;
+        -webkit-box-shadow:0px 0px 20px 4px #2a4171 inset;
+
+        /* border-radius */
+        border-radius:5px;
+        -moz-border-radius:5px;
+        -webkit-border-radius:5px;
+
+        /* border */
+        border:1px solid #1a5682;
+    }
+    .timer{
+        margin-top: 40px;
+        text-align: center;
+        color: #334c50;
+    }
+    .timer.yes{
+        color: #58ffdb;
+    }
+    .goal{
+        text-align: center;
+        color: #ccc;
+    }
+    .goal.yes{
+        color: #fff;
+    }
+    .goal.no{
+        color: red;
+    }
+    .target{
+        border: 1px solid #98aeff;
+    }
+    .siyo{
+        font-size: 15px;
+        text-align: center;
+    }
+    .siyo a{
+        color: #ccc;
+    }
+</style>
+<title>task02 - lightsout</title>
+</head>
+<body>
+    <h1>lights out</h1>
+    <div id="js-vue">
+        <lightout></lightout>
+    </div>
+    <p class="siyo">
+        <a href="https://ja.wikipedia.org/wiki/%E3%83%A9%E3%82%A4%E3%83%84%E3%82%A2%E3%82%A6%E3%83%88" target="_blank">※仕様</a>
+    </p>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://unpkg.com/vue@2.1.10/dist/vue.js"></script>
+    <script type="text/javascript">
+        var temp
+        = '<div v-if="setFlg">'
+        + '    <div class="lightout">'
+        + '        <div v-for="(val, key) in boxs" class="box" @click="pochi(key)" :class="[val == 1 ? \'on\' : \'off\', targetKey.indexOf(key) > -1 ? \'target\' : \'\']" @mouseover="search(key)" @mouseout="out()"></div>'
+        + '    </div>'
+        + '    <p class="timer" :class="[goal ? \'yes\' : \'no\']">{{timer}}</p>'
+        + '    <p class="goal" :class="[goal ? \'yes\' : \'no\']">{{goal}}</p>'
+        + '</div>';
+
+        Vue.component('lightout', {
+            template: temp,
+            data: function(){
+                return {
+                    setFlg: false,
+                    targetKey: [],
+                    now: null,
+                    startTime: null,
+                    endTime: null,
+                    timer: 0,
+                    boxs: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                }
+            },
+            methods: {
+                out: function(){
+                    this.targetKey = [];
+                },
+                search: function(key){
+                    this.targetKey = [];
+                    //自身をtoggle
+                    this.targetKey.push(key);
+                    //上をtoggle
+                    if(key > 4){
+                        this.targetKey.push(key - 5);
+                    }
+                    //下をtoggle
+                    if(key < 20){
+                        this.targetKey.push(key + 5);
+                    }
+                    //右をtoggle
+                    if(key % 5 != 4){
+                        this.targetKey.push(key + 1);
+                    }
+                    //左をtoggle
+                    if(key % 5 != 0){
+                        this.targetKey.push(key - 1);
+                    }
+                },
+                pochi: function(key){
+                    var vu = this;
+                    vu.search(key);
+                    vu.targetKey.forEach(function(key){
+                        vu.toggle(key);
+                    });
+                },
+                toggle: function(key){
+                    if(this.boxs[key] === 0){
+                        Vue.set(this.boxs, key, 1);
+                    }else{
+                        Vue.set(this.boxs, key, 0);
+                    }
+                },
+                rand: function(min, max){
+                    var num = Math.floor(Math.random() * (max + 1 - min)) + min;
+                    return num;
+                }
+            },
+            computed: {
+                goal: function(){
+                    if(this.setFlg){
+                        if(this.boxs.indexOf(1) < 0){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    }
+                }
+            },
+            created: function(){
+                var vu = this;
+                var imax = vu.rand(10, 15);
+                for(var i = 0; i < imax; i++){
+                    vu.pochi(vu.rand(0, 24));
+                }
+                vu.setFlg = true;
+                vu.targetKey = [];
+
+                vu.startTime = Date.now();
+                setInterval(function(){
+                    if(!vu.goal){
+                        var t = Date.now() - vu.startTime;
+                        vu.timer = (t/1000).toFixed(2);
+                    }
+                }, 90);
+            }
+        });
+
+        var vue = new Vue({
+            el: '#js-vue'
+        });
+    </script>
+</body>
+</html>
