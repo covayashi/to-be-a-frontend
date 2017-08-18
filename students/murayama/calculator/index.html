@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>電卓的なsomething</title>
+</head>
+<body>
+<!-- css -->
+<style>
+input#changeShisokuButtonColor {
+  background-color: #800080;
+}
+input#changeShisokuButtonColorRed {
+  background-color: #FF0000;
+}
+input#changeShisokuButtonColorAqua {
+  background-color: #00FFFF;
+}
+input#changeShisokuButtonColorGreen {
+  background-color: #008000;
+}
+</style>
+<script
+  src="http://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<!-- html -->
+<form name="dentaku">
+<input type="button" value="セーブボタン" id="save" onclick="saveFormula()">
+<input type="button" value="値入れ替え" name="change" onclick="changeNum()"><br>
+<!-- こっからボックス -->
+<input type="text" name="left" value="0" id="leftbox">
+<input id="changeShisokuButtonColor" type="button" name="shisoku" value="+">
+<input type="text" name="right" value="0" id="rightbox">
+=
+<input type="text" name="result" value="0" id="resultbox"><br>
+</form>
+<pre id="addElement"></pre>
+<!-- js -->
+<script type="text/javascript">
+$("input[name=change]").click( function() {
+  var left = document.dentaku.left.value;
+  var shisoku = document.dentaku.shisoku.value;
+  var right = document.dentaku.right.value;
+  var result = document.dentaku.result.value;
+  $("#resultbox").val(cal(left,right,shisoku,result));
+});
+$("input[name=shisoku]").click( function() {
+  changeShisoku();
+  var left = document.dentaku.left.value;
+  var shisoku = document.dentaku.shisoku.value;
+  var right = document.dentaku.right.value;
+  var result = document.dentaku.result.value;
+  $("#resultbox").val(cal(left,right,shisoku,result));
+});
+$('#rightbox,#leftbox').keyup(function() {
+  var left = document.dentaku.left.value;
+  var shisoku = document.dentaku.shisoku.value;
+  var right = document.dentaku.right.value;
+  var result = document.dentaku.result.value;
+  $("#resultbox").val(cal(left,right,shisoku,result));
+});
+function cal(left,right,shisoku,result){
+  if(left === "" || right === "")
+  {
+    if(left === "" && right === "")
+    {
+      result = "両辺に数値を入力してください";
+    }
+    else if(left === "")
+    {
+      result = "左辺に数値を入力してください";
+    }
+    else if(right === "")
+    {
+      result = "右辺に数値を入力してください";
+    }
+  }
+  else
+  {
+    if(shisoku === "+")
+    {
+      result =  parseInt(left) + parseInt(right);
+    }
+    else if(shisoku === "-")
+    {
+      result =  parseInt(left) - parseInt(right);
+    }
+    else if(shisoku === "×")
+    {
+      result =  parseInt(left) * parseInt(right);
+    }
+    else if(shisoku === "÷")
+    {
+      result =  parseInt(left) / parseInt(right);
+    }
+  }
+  return result;
+}
+//leftboxを先に持ってくると何故か反応してくれなかった
+function changeShisoku(){
+  var shisoku = document.dentaku.shisoku.value;
+  if(shisoku === "+")
+  {
+    document.dentaku.shisoku.value =  "-";
+    document.dentaku.shisoku.id = "changeShisokuButtonColor";
+  }
+  else if(shisoku === "-")
+  {
+    document.dentaku.shisoku.value =  "×";
+    document.dentaku.shisoku.id = "changeShisokuButtonColorRed";
+  }
+  else if(shisoku === "×")
+  {
+    document.dentaku.shisoku.value =  "÷";
+    document.dentaku.shisoku.id = "changeShisokuButtonColorAqua";
+  }
+  else if(shisoku === "÷")
+  {
+    document.dentaku.shisoku.value =  "+";
+    document.dentaku.shisoku.id = "changeShisokuButtonColorGreen";
+  }
+}
+function changeNum(){
+  var left = document.dentaku.left.value;
+  var right = document.dentaku.right.value;
+  document.dentaku.left.value = right;
+  document.dentaku.right.value = left;
+}
+function saveFormula(){
+  var left = document.dentaku.left.value;
+  var shisoku = document.dentaku.shisoku.value;
+  var right = document.dentaku.right.value;
+  var result = document.dentaku.result.value;
+  if(left !== "" && shisoku !== "" && right !== "")
+  {
+    var addElement = document.getElementById('addElement');
+    var text = left + " " + shisoku + " " + right + " " + "=" + " " + result;
+    var preNode = document.createElement('pre');
+    var textNode = document.createTextNode(text);
+    var fomularCount = 0
+    $('pre').each(function()
+    {
+      fomularCount++;
+    });
+    if(fomularCount === 1)
+    {
+      preNode.appendChild(textNode);
+      addElement.appendChild(preNode);
+    }
+    else
+    {
+      if($('pre').eq(String(fomularCount)).text() !== text)
+      {
+        console.log($('pre').eq(String(fomularCount)).text());
+        preNode.appendChild(textNode);
+        addElement.appendChild(preNode);
+      }
+    }
+    // 個数を取得
+    // 個数が0以外のとき
+    // 0から-1をした値が現在の数と同じなら何もしない
+  }
+}
+</script>
+</body>
+</html>
+<!-- 参考にしたサイトたち
+http://qiita.com/shuntaro_tamura/items/c9b2fec0f3a9f7d1e987
+https://www.ipentec.com/document/document.aspx?page=javascript-get-textbox-value
+-->
