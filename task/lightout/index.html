@@ -149,11 +149,13 @@
                     }
                 },
                 pochi: function(key){
-                    var vu = this;
-                    vu.search(key);
-                    vu.targetKey.forEach(function(key){
-                        vu.toggle(key);
-                    });
+                    if(!this.goal){
+                        var vu = this;
+                        vu.search(key);
+                        vu.targetKey.forEach(function(key){
+                            vu.toggle(key);
+                        });
+                    }
                 },
                 toggle: function(key){
                     if(this.boxs[key] === 0){
